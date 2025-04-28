@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#define TAM 10         // Tamanho do tabuleiro (10x10)
-#define NAVIO 3        // Tamanho fixo dos navios
+#define TAM 10     // Tamanho do tabuleiro (10x10)
+#define NAVIO 3    // Tamanho fixo dos navios
 
 int main() {
     int tabuleiro[TAM][TAM];
@@ -13,49 +13,95 @@ int main() {
         }
     }
 
-    // 2. Coordenadas iniciais dos navios (definidas no código)
-    // navioHorizontal[0] = linha, navioHorizontal[1] = coluna
-    int navioHorizontal[2] = {2, 4}; // Começa na linha 2, coluna 4
-    int navioVertical[2]   = {5, 1}; // Começa na linha 5, coluna 1
+    // 2. Coordenadas iniciais dos navios
+    // Formato: {linha, coluna}
+    int navioHorizontal[2] = {2, 4};  // Navio na horizontal
+    int navioVertical[2]   = {5, 1};  // Navio na vertical
+    int navioDiagonal1[2]  = {0, 0};  // Diagonal principal (linha == coluna)
+    int navioDiagonal2[2]  = {0, 9};  // Diagonal secundária (linha + coluna == 9)
 
-    // 3. Valida se o navio horizontal cabe no tabuleiro
+    int sobreposicao = 0;
+
+    // --- Validação e posicionamento do navio horizontal ---
     if (navioHorizontal[1] + NAVIO > TAM) {
         printf("Erro: navio horizontal ultrapassa o limite do tabuleiro.\n");
         return 1;
     }
 
-    // 4. Valida se o navio vertical cabe no tabuleiro
+    for (int i = 0; i < NAVIO; i++) {
+        if (tabuleiro[navioHorizontal[0]][navioHorizontal[1] + i] == 3) {
+            sobreposicao = 1;
+        }
+    }
+    if (sobreposicao) {
+        printf("Erro: sobreposição detectada no navio horizontal.\n");
+        return 1;
+    }
+    for (int i = 0; i < NAVIO; i++) {
+        tabuleiro[navioHorizontal[0]][navioHorizontal[1] + i] = 3;
+    }
+
+    // --- Validação e posicionamento do navio vertical ---
+    sobreposicao = 0;
     if (navioVertical[0] + NAVIO > TAM) {
         printf("Erro: navio vertical ultrapassa o limite do tabuleiro.\n");
         return 1;
     }
 
-    // 5. Verifica se as posições já estão ocupadas (sobreposição)
-    int sobreposicao = 0;
     for (int i = 0; i < NAVIO; i++) {
-        if (tabuleiro[navioHorizontal[0]][navioHorizontal[1] + i] == 3 ||
-            tabuleiro[navioVertical[0] + i][navioVertical[1]] == 3) {
+        if (tabuleiro[navioVertical[0] + i][navioVertical[1]] == 3) {
             sobreposicao = 1;
-            break;
         }
     }
-
     if (sobreposicao) {
-        printf("Erro: os navios estão se sobrepondo.\n");
+        printf("Erro: sobreposição detectada no navio vertical.\n");
         return 1;
     }
-
-    // 6. Posiciona navio horizontal
-    for (int i = 0; i < NAVIO; i++) {
-        tabuleiro[navioHorizontal[0]][navioHorizontal[1] + i] = 3;
-    }
-
-    // 7. Posiciona navio vertical
     for (int i = 0; i < NAVIO; i++) {
         tabuleiro[navioVertical[0] + i][navioVertical[1]] = 3;
     }
 
-    // 8. Exibe o tabuleiro
+    // --- Validação e posicionamento do navio diagonal 1 (principal) ---
+    sobreposicao = 0;
+    if (navioDiagonal1[0] + NAVIO > TAM || navioDiagonal1[1] + NAVIO > TAM) {
+        printf("Erro: navio diagonal 1 ultrapassa o limite do tabuleiro.\n");
+        return 1;
+    }
+
+    for (int i = 0; i < NAVIO; i++) {
+        if (tabuleiro[navioDiagonal1[0] + i][navioDiagonal1[1] + i] == 3) {
+            sobreposicao = 1;
+        }
+    }
+    if (sobreposicao) {
+        printf("Erro: sobreposição detectada no navio diagonal 1.\n");
+        return 1;
+    }
+    for (int i = 0; i < NAVIO; i++) {
+        tabuleiro[navioDiagonal1[0] + i][navioDiagonal1[1] + i] = 3;
+    }
+
+    // --- Validação e posicionamento do navio diagonal 2 (secundária) ---
+    sobreposicao = 0;
+    if (navioDiagonal2[0] + NAVIO > TAM || navioDiagonal2[1] - (NAVIO - 1) < 0) {
+        printf("Erro: navio diagonal 2 ultrapassa o limite do tabuleiro.\n");
+        return 1;
+    }
+
+    for (int i = 0; i < NAVIO; i++) {
+        if (tabuleiro[navioDiagonal2[0] + i][navioDiagonal2[1] - i] == 3) {
+            sobreposicao = 1;
+        }
+    }
+    if (sobreposicao) {
+        printf("Erro: sobreposição detectada no navio diagonal 2.\n");
+        return 1;
+    }
+    for (int i = 0; i < NAVIO; i++) {
+        tabuleiro[navioDiagonal2[0] + i][navioDiagonal2[1] - i] = 3;
+    }
+
+    // 3. Exibe o tabuleiro
     printf("\nTabuleiro:\n\n   ");
     for (int j = 0; j < TAM; j++) {
         printf("%2d", j); // Cabeçalho das colunas
